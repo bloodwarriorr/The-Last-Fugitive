@@ -17,5 +17,8 @@ server.use(helmet()); //more defense
 
 //api routes
 server.use('/api/users', require('./controllers/user_controllers'));
+server.use('/api/levels', require('./controllers/levels_controllers'));
+server.use('/api/hints', require('./controllers/hints_controllers'));
+server.use('/api/avatars', require('./controllers/avatar_controller'));
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));
