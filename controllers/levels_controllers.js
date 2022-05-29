@@ -29,8 +29,8 @@ LevelRouter.get('/:id', async (req, res) => {
 //Create
 LevelRouter.post('/add', async (req, res) => {
     try {
-        let { map,player,enemies,step_cap,difficulty } = req.body;
-        let level = new Level(map,player,enemies,step_cap,difficulty);
+        let { code,map,player,enemies,step_cap,difficulty } = req.body;
+        let level = new Level(code,map,player,enemies,step_cap,difficulty);
         let data = await new DB().Insert("levels", level);
         res.status(201).json(data);
     } catch (error) {
@@ -42,8 +42,8 @@ LevelRouter.post('/add', async (req, res) => {
 LevelRouter.put('/update/:id', async (req, res) => {
     try {
         let { id } = req.params;
-        let {  map,player,enemies,step_cap,difficulty } = req.body;
-        let level = new Level( map,player,enemies,step_cap,difficulty);
+        let { code, map,player,enemies,step_cap,difficulty } = req.body;
+        let level = new Level( code,map,player,enemies,step_cap,difficulty);
         let data = await new DB().UpdateDocById("levels", id, level);
         res.status(201).json(data);
     } catch (error) {

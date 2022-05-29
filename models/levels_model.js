@@ -1,5 +1,5 @@
 class Level {
-    code=0;
+    code;
     map;
     player;
     enemies;
@@ -9,8 +9,8 @@ class Level {
   
    
 
-    constructor(map,player,enemies,step_cap,difficulty){
-        this.code+=1
+    constructor(code,map,player,enemies,step_cap,difficulty){
+        this.code=code
         this.map=map
         this.player=player
         this.enemies=enemies
