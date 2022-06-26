@@ -30,7 +30,16 @@ class DB {
             await this.client.close();
         }
     }
-
+    async FindByEmail(collection, emailToSearch) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).findOne({ email: emailToSearch });
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
     async Insert(collection, doc) {
         try {
             await this.client.connect();

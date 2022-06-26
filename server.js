@@ -5,6 +5,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const auth = require("./middleware/auth");
 
 //port
 const PORT = process.env.PORT || 5008;

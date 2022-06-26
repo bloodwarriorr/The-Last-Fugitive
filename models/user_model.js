@@ -1,7 +1,5 @@
 class User {
     nickname;
-    email;
-    password;
     current_level;
     level_rank;
     avatars;
@@ -11,13 +9,13 @@ class User {
     play_dates;
    
 
-    constructor(nickname, email,password,current_level,level_rank,avatars,gender){
+    constructor(nickname, email,password,avatars,gender){
         this.nickname=nickname;
         this.email=email;
         this.password = password;
-        this.level_rank = [{"level_code":level_rank[0].level_code,"rank":level_rank[0].rank}]
+        this.level_rank = [{"level_code":1,"rank":0}]
         this.avatars = avatars;
-        this.current_level = current_level;
+        this.current_level = 1;
         this.gender = gender;
         this.is_notification=true;
         this.time_of_register=new Date().getDate();

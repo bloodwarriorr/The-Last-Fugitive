@@ -1,30 +1,32 @@
 {
-  "name":"the_last_fugitive",
+  "name": "the_last_fugitive",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "start-dev":"nodemon server.js",
-    "publish":"git push heroku main",
-    "test":"echo \"Error: no test specified\"&&exit 1"
+    "start-dev": "nodemon server.js",
+    "publish": "git push heroku main",
+    "test": "echo \"Error: no test specified\"&&exit 1"
   },
   "repository": {
     "type": "git",
-    "url":"git+https://github.com/bloodwarriorr/The-Last-Fugitive.git"
+    "url": "git+https://github.com/bloodwarriorr/The-Last-Fugitive.git"
   },
-  "keywords":[],
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url":"https://github.com/bloodwarriorr/The-Last-Fugitive/issues"
+    "url": "https://github.com/bloodwarriorr/The-Last-Fugitive/issues"
   },
   "homepage": "https://github.com/bloodwarriorr/The-Last-Fugitive#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "helmet": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.6.0"
   },
   "devDependencies": {
