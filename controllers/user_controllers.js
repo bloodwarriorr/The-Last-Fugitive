@@ -3,7 +3,7 @@ const DB = require('../utils/db');
 const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
 const UserRouter = require('express').Router();
-
+const auth = require("../middleware/auth");
 //CRUD
 
 //Read all
@@ -154,5 +154,9 @@ UserRouter.post("/register", async (req, res) => {
       console.log(err);
     }
     // Our register logic ends here
+  });
+
+  UserRouter.post("/welcome", auth, (req, res) => {
+    res.status(200).send("Welcome 🙌 ");
   });
 module.exports = UserRouter;
