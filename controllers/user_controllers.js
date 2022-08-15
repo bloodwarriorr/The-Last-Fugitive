@@ -251,7 +251,7 @@ UserRouter.put('/update/levelRank/:id', async (req, res) => {
 UserRouter.put('/update/addLevelRank/:id', async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().addPlayDate("users", id, req.body);
+    let data = await new DB().addLevelRank("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });

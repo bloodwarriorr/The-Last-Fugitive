@@ -254,7 +254,7 @@ class DB {
         }
     }
     //add level rank to user level rank array 
-    async addPlayDate(collection, id, doc) {
+    async addLevelRank(collection, id, doc) {
         try {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
