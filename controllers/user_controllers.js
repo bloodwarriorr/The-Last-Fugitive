@@ -246,6 +246,19 @@ UserRouter.put('/update/levelRank/:id', async (req, res) => {
   }
 });
 
+
+//add level rank to level rank arr
+UserRouter.put('/update/addLevelRank/:id', async (req, res) => {
+  try {
+      let { id } = req.params;
+      let data = await new DB().addPlayDate("users", id, req.body);
+      res.status(201).json(data);
+  } catch (error) {
+      res.status(500).json({ error });
+  }
+});
+
+
   UserRouter.post("/welcome", auth, (req, res) => {
     res.status(200).send("Welcome 🙌 ");
   });

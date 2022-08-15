@@ -230,7 +230,7 @@ class DB {
         try {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
-                { _id: ObjectId(id),"level_rank.level_code":doc.level_code },
+                { _id: ObjectId(id), "level_rank.level_code": doc.level_code },
                 { $set: { "level_rank.$.popularity": doc.popularity } });
         } catch (error) {
             console.log(error)
@@ -239,20 +239,36 @@ class DB {
             await this.client.close();
         }
     }
-        //update level rank in user doc
-        async UpdateLevelRank(collection, id, doc) {
-            try {
-                await this.client.connect();
-                return await this.client.db(this.dbName).collection(collection).updateOne(
-                    { _id: ObjectId(id),"level_rank.level_code":doc.level_code },
-                    { $set: { "level_rank.$.rank": doc.rank } });
-            } catch (error) {
-                console.log(error)
-                return error;
-            } finally {
-                await this.client.close();
-            }
+    //update level rank in user doc
+    async UpdateLevelRank(collection, id, doc) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).updateOne(
+                { _id: ObjectId(id), "level_rank.level_code": doc.level_code },
+                { $set: { "level_rank.$.rank": doc.rank } });
+        } catch (error) {
+            console.log(error)
+            return error;
+        } finally {
+            await this.client.close();
         }
+    }
+    //add level rank to user level rank array 
+    async addPlayDate(collection, id, doc) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).updateOne(
+                { _id: ObjectId(id) },
+                { $push: { level_rank: { level_code: doc.level_code, rank: doc.rank,popularity:doc.popularity } } }
+            );
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
 }
 
 module.exports = DB;
