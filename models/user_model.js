@@ -20,7 +20,7 @@ class User {
         this.gender = gender;
         this.avatarUrl=avatarUrl;
         this.is_notification=true;
-        this.time_of_register=new Date().getDate();
+        this.time_of_register=new Date();
         this.play_dates=[]
 
     }
