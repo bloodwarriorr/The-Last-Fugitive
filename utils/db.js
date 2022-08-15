@@ -230,7 +230,7 @@ class DB {
         try {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
-                { _id: ObjectId(id),"level_rank.level_code":doc.code },
+                { _id: ObjectId(id),"level_rank.level_code":doc.level_code },
                 { $set: { "level_rank.$.popularity": doc.popularity } });
         } catch (error) {
             console.log(error)
@@ -244,7 +244,7 @@ class DB {
             try {
                 await this.client.connect();
                 return await this.client.db(this.dbName).collection(collection).updateOne(
-                    { _id: ObjectId(id),"level_rank.level_code":doc.code },
+                    { _id: ObjectId(id),"level_rank.level_code":doc.level_code },
                     { $set: { "level_rank.$.rank": doc.rank } });
             } catch (error) {
                 console.log(error)
