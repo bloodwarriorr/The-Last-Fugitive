@@ -217,7 +217,7 @@ class DB {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
                 { _id: ObjectId(id) },
-                { $set: { current_level: doc } });
+                { $set: { current_level: doc.current_level } });
         } catch (error) {
             console.log(error)
             return error;
