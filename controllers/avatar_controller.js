@@ -50,6 +50,31 @@ AvatarRouter.put('/update/:id', async (req, res) => {
         res.status(500).json({ error });
     }
 });
+//remove option from avatar options
+AvatarRouter.put('/update/avatarOption/:id', async (req, res) => {
+    try {
+        let { id } = req.params;
+        let {code} = req.body;
+        let data = await new DB().removeAvatarOption("avatars", id, code);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//add choice option in avatar option array
+AvatarRouter.put('/update/addAvatarOption/:id', async (req, res) => {
+    try {
+        let { id } = req.params;
+        
+        let data = await new DB().addAvatarOption("avatars", id, req.body);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+
 
 //Delete
 AvatarRouter.delete('/delete/:id', async (req, res) => {
