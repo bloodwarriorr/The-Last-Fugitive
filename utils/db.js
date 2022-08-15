@@ -188,7 +188,7 @@ class DB {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
                 { _id: ObjectId(id) },
-                { $set: { is_notification: doc } });
+                { $set: { is_notification: doc.is_notification } });
         } catch (error) {
             console.log(error)
             return error;
