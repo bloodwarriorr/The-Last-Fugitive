@@ -5,6 +5,7 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const express = require("express");
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 
 router.post("/reset", async (req, res) => {
     try {
@@ -18,7 +19,7 @@ router.post("/reset", async (req, res) => {
         }
 
         const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
-        await sendEmail(user.email, "Password reset", link);
+        await sendEmail(user.email, "Click on the link to reset your password", link);
 
         res.send("password reset link sent to your email account");
     } catch (error) {
@@ -29,20 +30,17 @@ router.post("/reset", async (req, res) => {
 
 router.post("/:userId/:token", async (req, res) => {
     try {
-       
         const user = await new DB().FindByID("users",req.params.userId);
+       
         if (!user) return res.status(400).send("invalid link or expired");
-
-        const token = await Token.findOne({
-            userId: user._id,
-            token: req.params.token,
-        });
-        if (!token) return res.status(400).send("Invalid link or expired");
         
-        user.password = req.body.password;
-        await new DB().UpdateDocById("users",user)
-        await token.delete();
-
+        const token = await new DB().FindByUserId("token",user._id.toString())
+       
+        if (!token) return res.status(400).send("Invalid link or expired");
+        encryptedPassword = await bcrypt.hash(req.body.password, 10);
+        user.password = encryptedPassword
+        await new DB().UpdateDocById("users",user._id,user)
+        await new DB().DeleteDocById("token",token._id.toString())
         res.send("password reset sucessfully.");
     } catch (error) {
         res.send("An error occured");

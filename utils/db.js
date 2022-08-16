@@ -30,6 +30,17 @@ class DB {
             await this.client.close();
         }
     }
+//help function for find user id in token collection
+    async FindByUserId(collection, id) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).findOne({ userId: ObjectId(id) });
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    } 
     async FindByEmail(collection, emailToSearch) {
         try {
             await this.client.connect();
@@ -82,6 +93,18 @@ class DB {
             return await this.client.db(this.dbName).collection(collection).updateOne(
                 { _id: ObjectId(id) },
                 { $set: { isActive: false } });
+        } catch (error) {
+            console.log(error)
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+    async DeleteDocById(collection, id) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).deleteOne(
+                { _id: ObjectId(id) });
         } catch (error) {
             console.log(error)
             return error;
