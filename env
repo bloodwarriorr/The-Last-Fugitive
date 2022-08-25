@@ -1,0 +1,9 @@
+NODE_ENV=development
+DB_URI=mongodb+srv://Last_Fugitive:GWg9Twcy0Ss0jAyi@thelastfugitive.7fr9k.mongodb.net/?retryWrites=true&w=majority
+DB_NAME=TheLastFugitive
+USER=TheLastFugitive@outlook.co.il
+PASS=kenarori334
+HOST=smtp-mail.outlook.com
+SERVICE=SMTP
+BASE_URL = https://the-last-fugitive.herokuapp.com/api
+TOKEN_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
