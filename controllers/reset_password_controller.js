@@ -10,13 +10,16 @@ const bcrypt = require('bcryptjs');
 router.post("/reset", async (req, res) => {
     try {
     let { email } = req.body; //get the id param.
+
     let user = await new DB().FindByEmail("users", email);
-        console.log(user._id)
-        let token = await new DB().FindByID("token",user._id)
+        
+        let token = await new DB().FindByUserId("token",user._id.toString())
+        
         if (!token) {
             token=new Token(user._id,crypto.randomBytes(32).toString("hex"))
             await new DB().Insert("token", token);
         }
+       
         const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
         await sendEmail(user.email, "Click on the link to reset your password", link);
         res.send("password reset link sent to your email account");

@@ -112,10 +112,8 @@ UserRouter.post("/register", async (req, res) => {
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
     let user = new User(nickname, email.toLowerCase(), encryptedPassword, avatarCode, gender, avatarUrl);
-    await new DB().Insert("users", user);
-
-    // Create token
-    const token = jwt.sign(
+     // Create token
+     const token = jwt.sign(
       { user_id: user._id, email },
       process.env.TOKEN_KEY,
       {
@@ -124,6 +122,9 @@ UserRouter.post("/register", async (req, res) => {
     );
     // save user token
     user.token = token;
+    await new DB().Insert("users", user);
+
+   
 
     // return new user
     res.status(201).json(user);
