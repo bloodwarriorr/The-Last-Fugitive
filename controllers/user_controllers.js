@@ -1,4 +1,5 @@
 const User = require('../models/user_model');
+const Guest = require('../models/guest_model')
 const DB = require('../utils/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +7,7 @@ const UserRouter = require('express').Router();
 const auth = require("../middleware/auth");
 //CRUD
 
+//admin cruds
 //Read all
 UserRouter.get('/', async (req, res) => {
   try {
@@ -82,16 +84,19 @@ UserRouter.put('/reactive/:id', async (req, res) => {
     res.status(500).json({ error });
   }
 });
+
+
+//user cruds
 //Register
 UserRouter.post("/register", async (req, res) => {
 
-  // Our register logic starts here
+
   try {
     // Get user input
     let { nickname, email, password, avatarCode, gender, avatarUrl } = req.body
 
     // Validate user input
-    if (!(nickname && email && password && avatarCode>=0 && gender && avatarUrl)) {
+    if (!(nickname && email && password && avatarCode >= 0 && gender && avatarUrl)) {
       return res.status(400).send("All input is required");
     }
 
@@ -102,18 +107,14 @@ UserRouter.post("/register", async (req, res) => {
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
     }
-    //if we want to pull the data from db
-    // const avatarUrl=await new DB().FindByAvatarCode("avatars",avatarCode,gender);
-    // if(!avatarUrl){
-    //   return res.status(409).send("Could not find picture, try again!");
-    // }
+
 
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
     let user = new User(nickname, email.toLowerCase(), encryptedPassword, avatarCode, gender, avatarUrl);
-     // Create token
-     const token = jwt.sign(
+    // Create token
+    const token = jwt.sign(
       { user_id: user._id, email },
       process.env.TOKEN_KEY,
       {
@@ -124,14 +125,14 @@ UserRouter.post("/register", async (req, res) => {
     user.token = token;
     await new DB().Insert("users", user);
 
-   
+
 
     // return new user
     res.status(201).json(user);
   } catch (err) {
     console.log(err);
   }
-  // Our register logic ends here
+
 });
 //Login
 UserRouter.post("/login", async (req, res) => {
@@ -170,8 +171,11 @@ UserRouter.post("/login", async (req, res) => {
   }
   // Our register logic ends here
 });
+
+//following controllers require auth token:
+
 //update avatar
-UserRouter.put('/update/avatar/:id', async (req, res) => {
+UserRouter.put('/update/avatar/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
 
@@ -183,7 +187,7 @@ UserRouter.put('/update/avatar/:id', async (req, res) => {
 });
 
 //update NickName
-UserRouter.put('/update/nickName/:id', async (req, res) => {
+UserRouter.put('/update/nickName/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().UpdateNickName("users", id, req.body);
@@ -194,7 +198,7 @@ UserRouter.put('/update/nickName/:id', async (req, res) => {
 });
 
 //update notification:
-UserRouter.put('/update/notification/:id', async (req, res) => {
+UserRouter.put('/update/notification/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().UpdateNotifications("users", id, req.body);
@@ -204,7 +208,7 @@ UserRouter.put('/update/notification/:id', async (req, res) => {
   }
 });
 //add play date to play dates arr
-UserRouter.put('/update/addPlayDate/:id', async (req, res) => {
+UserRouter.put('/update/addPlayDate/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().addPlayDate("users", id, req.body);
@@ -214,7 +218,7 @@ UserRouter.put('/update/addPlayDate/:id', async (req, res) => {
   }
 });
 //update current level in user doc 
-UserRouter.put('/update/currentLevel/:id', async (req, res) => {
+UserRouter.put('/update/currentLevel/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().UpdateCurrentLevel("users", id, req.body);
@@ -225,7 +229,7 @@ UserRouter.put('/update/currentLevel/:id', async (req, res) => {
 });
 
 //update level popularity in user doc 
-UserRouter.put('/update/levelPopularity/:id', async (req, res) => {
+UserRouter.put('/update/levelPopularity/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().UpdateLevelPopularity("users", id, req.body);
@@ -237,7 +241,7 @@ UserRouter.put('/update/levelPopularity/:id', async (req, res) => {
 
 
 //update current level in user doc 
-UserRouter.put('/update/levelRank/:id', async (req, res) => {
+UserRouter.put('/update/levelRank/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().UpdateLevelRank("users", id, req.body);
@@ -249,7 +253,7 @@ UserRouter.put('/update/levelRank/:id', async (req, res) => {
 
 
 //add level rank to level rank arr
-UserRouter.put('/update/addLevelRank/:id', async (req, res) => {
+UserRouter.put('/update/addLevelRank/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
     let data = await new DB().addLevelRank("users", id, req.body);
@@ -259,8 +263,53 @@ UserRouter.put('/update/addLevelRank/:id', async (req, res) => {
   }
 });
 
+//sign up user as guest
+UserRouter.post("/guestRegister", async (req, res) => {
 
-UserRouter.post("/welcome", auth, (req, res) => {
-  res.status(200).send("Welcome 🙌 ");
+  try {
+
+    // Get user input
+    let { nickname, email, password } = req.body
+    const guest = await new DB().FindGuestByNickname("guests", nickname)
+
+    // Validate user input
+    if (!(nickname && email && password)) {
+      return res.status(400).send("All input is required");
+    }
+
+    // check if user already exist
+    // Validate if user exist in our database
+    const oldUser = await new DB().FindByEmail("users", email);
+
+    if (oldUser) {
+      return res.status(409).send("User Already Exist. Please Login");
+    }
+
+    //Encrypt user password
+    encryptedPassword = await bcrypt.hash(password, 10);
+    // Create user in our database
+    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, guest.gender, guest.avatarUrl);
+    // Create token
+    const token = jwt.sign(
+      { user_id: user._id, email },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
+    // save user token
+    user.token = token;
+    await new DB().Insert("users", user);
+    // return new user
+    res.status(201).json(user);
+  } catch (err) {
+    console.log(err);
+  }
+
 });
+
+
+// UserRouter.post("/welcome", auth, (req, res) => {
+//   res.status(200).send("Welcome 🙌 ");
+// });
 module.exports = UserRouter;

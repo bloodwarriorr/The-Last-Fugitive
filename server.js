@@ -5,7 +5,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const auth=require("./middleware/auth")
+
 
 
 //port
@@ -24,6 +24,7 @@ server.use('/api/users', require('./controllers/user_controllers'));
 server.use('/api/levels',require('./controllers/levels_controllers'));
 server.use('/api/hints', require('./controllers/hints_controllers'));
 server.use('/api/avatars', require('./controllers/avatar_controller'));
+server.use('/api/guests', require('./controllers/guest_controller'));
 server.use("/api/password-reset", passwordReset);
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));

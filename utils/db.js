@@ -149,7 +149,16 @@ class DB {
             await this.client.close();
         }
     }
-
+    async FindGuestByNickname(collection,nickName){
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).findOne({ nickname: nickName });
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
     //update nickname in user doc
     async UpdateNickName(collection, id, doc) {
         try {
