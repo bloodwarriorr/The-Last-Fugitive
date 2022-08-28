@@ -2,7 +2,7 @@ const Guest=require('../models/guest_model')
 const jwt = require('jsonwebtoken');
 const DB = require('../utils/db');
 const GuestRouter = require('express').Router();
-
+const auth = require("../middleware/auth");
 
 //sign up user as guest
 GuestRouter.post("/register", async (req, res) => {
@@ -27,6 +27,73 @@ GuestRouter.post("/register", async (req, res) => {
     console.log(err);
   }
   });
+  
+  //update notification:
+  GuestRouter.put('/update/notification/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().UpdateNotifications("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  //add play date to play dates arr
+  GuestRouter.put('/update/addPlayDate/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().addPlayDate("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  //update current level in user doc 
+  GuestRouter.put('/update/currentLevel/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().UpdateCurrentLevel("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  //update level popularity in user doc 
+  GuestRouter.put('/update/levelPopularity/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().UpdateLevelPopularity("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  //update current level in user doc 
+  GuestRouter.put('/update/levelRank/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().UpdateLevelRank("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  
+  //add level rank to level rank arr
+  GuestRouter.put('/update/addLevelRank/:id', auth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().addLevelRank("guests", id, req.body);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+ 
   module.exports = GuestRouter;
 
 
