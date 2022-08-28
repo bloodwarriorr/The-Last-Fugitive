@@ -10,18 +10,33 @@ class User {
     avatarUrl;
    
 
-    constructor(nickname, email,password,avatarCode,gender,avatarUrl){
+    // constructor(nickname, email,password,avatarCode,gender,avatarUrl){
+    //     this.nickname=nickname;
+    //     this.email=email;
+    //     this.password = password;
+    //     this.level_rank = []
+    //     this.avatarCode = avatarCode;
+    //     this.current_level = 1;
+    //     this.gender = gender;
+    //     this.avatarUrl=avatarUrl;
+    //     this.is_notification=true;
+    //     this.time_of_register=new Date();
+    //     this.play_dates=[]
+
+    // }
+
+    constructor(nickname, email,password,avatarCode,gender,avatarUrl,level_rank=[],current_level=1,is_notification=true,time_of_register=new Date(),play_dates=[]){
         this.nickname=nickname;
         this.email=email;
         this.password = password;
-        this.level_rank = []
+        this.level_rank = level_rank
         this.avatarCode = avatarCode;
-        this.current_level = 1;
+        this.current_level = current_level;
         this.gender = gender;
         this.avatarUrl=avatarUrl;
-        this.is_notification=true;
-        this.time_of_register=new Date();
-        this.play_dates=[]
+        this.is_notification=is_notification;
+        this.time_of_register=time_of_register;
+        this.play_dates=play_dates
 
     }
 }

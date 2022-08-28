@@ -288,7 +288,8 @@ UserRouter.post("/guestRegister", async (req, res) => {
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
-    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, guest.gender, guest.avatarUrl);
+    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, guest.gender, 
+    guest.avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
     // Create token
     const token = jwt.sign(
       { user_id: user._id, email },
@@ -302,6 +303,7 @@ UserRouter.post("/guestRegister", async (req, res) => {
     await new DB().Insert("users", user);
     // return new user
     res.status(201).json(user);
+   await new DB().DeleteDocById("guests",guest._id)
   } catch (err) {
     console.log(err);
   }
