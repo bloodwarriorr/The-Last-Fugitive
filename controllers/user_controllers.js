@@ -263,8 +263,8 @@ UserRouter.post("/guestRegister", async (req, res) => {
   try {
 
     // Get user input
-    let { nickname, email, password,gender } = req.body
-    const guest = await new DB().FindGuestByNickname("guests", nickname)
+    let { nickname, email, password,gender,id } = req.body
+    const guest = await new DB().FindByID("guests", id)
 
     // Validate user input
     if (!(nickname && email && password)) {
