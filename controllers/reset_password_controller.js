@@ -12,7 +12,9 @@ router.post("/reset", async (req, res) => {
     let { email } = req.body; //get the id param.
 
     let user = await new DB().FindByEmail("users", email);
-        
+        if(!user){
+            return res.status(400).send("User not found!");
+        }
         let token = await new DB().FindByUserId("token",user._id.toString())
         
         if (!token) {
