@@ -92,7 +92,17 @@ GuestRouter.post("/register", async (req, res) => {
       res.status(500).json({ error });
     }
   });
-  
+
+  //fetch the guest by id
+  GuestRouter.get('/:id', async (req, res) => {
+    try {
+      let { id } = req.params; //get the id param.
+      let data = await new DB().FindByID("guests", id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
  
   module.exports = GuestRouter;
 
