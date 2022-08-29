@@ -263,7 +263,7 @@ UserRouter.post("/guestRegister", async (req, res) => {
   try {
 
     // Get user input
-    let { nickname, email, password } = req.body
+    let { nickname, email, password,gender } = req.body
     const guest = await new DB().FindGuestByNickname("guests", nickname)
 
     // Validate user input
@@ -282,7 +282,7 @@ UserRouter.post("/guestRegister", async (req, res) => {
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
-    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, guest.gender, 
+    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, gender, 
     guest.avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
     // Create token
     const token = jwt.sign(
