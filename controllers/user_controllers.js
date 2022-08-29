@@ -263,11 +263,11 @@ UserRouter.post("/guestRegister", async (req, res) => {
   try {
 
     // Get user input
-    let { nickname, email, password,gender,id } = req.body
+    let { nickname, email, password,gender,id,avatarCode,avatarUrl } = req.body
     const guest = await new DB().FindByID("guests", id)
 
     // Validate user input
-    if (!(nickname && email && password)) {
+    if (!(nickname && email && password&&avatarCode >= 0 && gender && avatarUrl)) {
       return res.status(400).send("All input is required");
     }
 
@@ -282,8 +282,8 @@ UserRouter.post("/guestRegister", async (req, res) => {
     //Encrypt user password
     encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
-    let user = new User(nickname, email.toLowerCase(), encryptedPassword, guest.avatarCode, gender, 
-    guest.avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
+    let user = new User(nickname, email.toLowerCase(), encryptedPassword, avatarCode, gender, 
+    avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
     // Create token
     const token = jwt.sign(
       { user_id: user._id, email },
