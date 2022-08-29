@@ -13,10 +13,7 @@ GuestRouter.post("/register", async (req, res) => {
      // Create token
      const token = jwt.sign(
       { user_id: guest._id, nickname },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
+      process.env.TOKEN_KEY
     );
     // save user token
     guest.token = token;

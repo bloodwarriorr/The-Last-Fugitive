@@ -116,10 +116,7 @@ UserRouter.post("/register", async (req, res) => {
     // Create token
     const token = jwt.sign(
       { user_id: user._id, email },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
+      process.env.TOKEN_KEY
     );
     // save user token
     user.token = token;
@@ -153,10 +150,7 @@ UserRouter.post("/login", async (req, res) => {
       // Create token
       const token = jwt.sign(
         { user_id: user._id, email },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
+        process.env.TOKEN_KEY
       );
 
       // save user token
