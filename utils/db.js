@@ -234,7 +234,7 @@ class DB {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
                 { _id: ObjectId(id) },
-                { $push: { play_dates: { start_date: doc.start_date, end_date: doc.end_date } } }
+                { $set: { play_dates: doc } }
             );
         }
         catch (error) {
@@ -243,6 +243,9 @@ class DB {
             await this.client.close();
         }
     }
+
+
+
     //update current level field in user doc
     async UpdateCurrentLevel(collection, id, doc) {
         try {
