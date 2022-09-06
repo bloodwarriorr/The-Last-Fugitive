@@ -168,10 +168,12 @@ class DB {
             { '$match': { 'time_of_register': { '$gte': new Date(`${year}-01-01T08:16:53.126Z`) } } },
             {
                 '$group': {
-                    '_id': { '$dateToString': { 'format': "%Y-%m-%d", 'date': "$time_of_register" } },
+                    '_id': { '$year':{'$toDate':"$time_of_register" } },
                     'Value': { '$sum': 1 }
-                }
+                },
+              
             },
+            
 
         ]
         try {
