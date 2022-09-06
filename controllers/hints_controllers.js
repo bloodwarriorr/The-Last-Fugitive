@@ -1,4 +1,4 @@
-const Hint = require('../models/hints_model');
+
 const DB = require('../utils/db');
 
 const HintRouter = require('express').Router();

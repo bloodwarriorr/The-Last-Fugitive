@@ -6,10 +6,10 @@ class Level {
     step_cap;
     difficulty;
     popularity;
-  
+    end_point;
    
 
-    constructor(code,map,player,enemies,step_cap,difficulty){
+    constructor(code,map,player,enemies,step_cap,difficulty,end_point){
         this.code=code
         this.map=map
         this.player=player
@@ -17,6 +17,7 @@ class Level {
         this.step_cap=step_cap
         this.difficulty=difficulty
         this.popularity=0
+        this.end_point=end_point
 
     }
 }

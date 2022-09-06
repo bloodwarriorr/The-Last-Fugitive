@@ -1,4 +1,7 @@
 const DB = require('../utils/db');
+const Level = require('../models/levels_model');
+const Avatar = require('../models/avatar_model');
+const Hint = require('../models/hints_model');
 const AdminRouter = require('express').Router();
 const adminAuth = require("../middleware/authAdmin");
 
@@ -36,7 +39,7 @@ AdminRouter.post('/signUp', async (req, res) => {
     }
 })
 
-AdminRouter.post('/popularLevels',adminAuth,async (req, res) => {
+AdminRouter.get('/popularLevels',adminAuth,async (req, res) => {
     try{
     const popularLevels=await new DB().PopularLevelMapReduce("users")
     console.log(popularLevels)
@@ -50,7 +53,7 @@ AdminRouter.post('/popularLevels',adminAuth,async (req, res) => {
 })
 
 
-AdminRouter.post('/TotalRegistration',adminAuth,async (req, res) => {
+AdminRouter.get('/TotalRegistration',adminAuth,async (req, res) => {
     try{
     const amountOfRegisteration=await new DB().AmountOfRegestation("users",req.body.year)
     if(amountOfRegisteration){
@@ -62,7 +65,7 @@ AdminRouter.post('/TotalRegistration',adminAuth,async (req, res) => {
     }
 })
 
-AdminRouter.post('/LevelRankAvg',adminAuth,async (req, res) => {
+AdminRouter.get('/LevelRankAvg',adminAuth,async (req, res) => {
     try{
     const levelRankingAvg=await new DB().LevelRankningAvg("users")
     if(levelRankingAvg){
@@ -73,7 +76,7 @@ AdminRouter.post('/LevelRankAvg',adminAuth,async (req, res) => {
         res.status(500).json({ error });
     }
 });
-AdminRouter.post('/popHours',adminAuth,async (req, res) => {
+AdminRouter.get('/popHours',adminAuth,async (req, res) => {
     try{
     const popularHours=await new DB().PlayTimeHoursPop("users")
     if(popularHours){
@@ -152,12 +155,19 @@ AdminRouter.post('/users/add',adminAuth, async (req, res) => {
         res.status(500).json({ error });
     }
 });
-
+AdminRouter.get('/levels',adminAuth, async (req, res) => {
+    try {
+        let data = await new DB().FindAll("levels");
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
 //Create
 AdminRouter.post('/levels/add',adminAuth, async (req, res) => {
     try {
-        let { code,map,player,enemies,step_cap,difficulty } = req.body;
-        let level = new Level(code,map,player,enemies,step_cap,difficulty);
+        let { code,map,player,enemies,step_cap,difficulty,end_point } = req.body;
+        let level = new Level(code,map,player,enemies,step_cap,difficulty,end_point);
         let data = await new DB().Insert("levels", level);
         res.status(201).json(data);
     } catch (error) {

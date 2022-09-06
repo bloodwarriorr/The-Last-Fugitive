@@ -1,4 +1,4 @@
-const Avatar = require('../models/avatar_model');
+
 const DB = require('../utils/db');
 
 const AvatarRouter = require('express').Router();

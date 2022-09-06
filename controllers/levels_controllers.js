@@ -1,4 +1,4 @@
-const Level = require('../models/levels_model');
+
 const DB = require('../utils/db');
 
 const LevelRouter = require('express').Router();
