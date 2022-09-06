@@ -125,3 +125,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+# fire base auth
+the-lastfugitive-firebase-adminsdk-5fs1p-142dd4221d.json

@@ -30,7 +30,17 @@ class DB {
             await this.client.close();
         }
     }
-//help function for find user id in token collection
+    async FindByUID(collection, uid) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).findOne({ uid: uid });
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+    //help function for find user id in token collection
     async FindByUserId(collection, id) {
         try {
             await this.client.connect();
@@ -40,7 +50,7 @@ class DB {
         } finally {
             await this.client.close();
         }
-    } 
+    }
     async FindByEmail(collection, emailToSearch) {
         try {
             await this.client.connect();
@@ -126,6 +136,219 @@ class DB {
             await this.client.close();
         }
     }
+
+
+    //aggregate functions:
+    //popular levels according to popularity rate
+    async PopularLevelMapReduce(collection) {
+        let mapArr = []
+        const pipeline = [
+            { '$unwind': "$level_rank" },
+            { '$group': { '_id': "$level_rank.level_code", 'Value': { '$sum': '$level_rank.popularity' } } },
+            { '$limit': 3 }
+        ]
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+            for await (const doc of aggregateCursor)
+                mapArr.push(doc)
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+    //Total year regestation
+    async AmountOfRegestation(collection, year) {
+        let mapArr = []
+        const pipeline = [
+            { '$match': { 'time_of_register': { '$gte': new Date(`${year}-01-01T08:16:53.126Z`) } } },
+            {
+                '$group': {
+                    '_id': { '$dateToString': { 'format': "%Y-%m-%d", 'date': "$time_of_register" } },
+                    'Value': { '$sum': 1 }
+                }
+            },
+
+        ]
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+            for await (const doc of aggregateCursor)
+                mapArr.push(doc)
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+    //avg of user ranking per level
+    async LevelRankningAvg(collection) {
+        let mapArr = []
+        const pipeline = [
+            { '$unwind': '$level_rank' },
+            {
+                '$group': {
+                    '_id': '$level_rank.level_code',
+                    'Value': { '$avg': { '$sum': '$level_rank.rank' } }
+                }
+            },
+
+        ]
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+            for await (const doc of aggregateCursor)
+                mapArr.push(doc)
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+    //Popular playtime hours
+    async PlayTimeHoursPop(collection) {
+        let mapArr = []
+        const pipeline = [
+            { '$unwind': '$play_dates' },
+            {
+                '$group': {
+                    '_id': {'$hour':{'$toDate':"$play_dates.start_date"}},
+                    'Hours': {
+                        '$sum': {
+                            '$dateDiff':
+                            {
+                               'startDate': {'$toDate':"$play_dates.start_date"},
+                               'endDate': {'$toDate':"$play_dates.end_date"},
+                               'unit': "minute"
+                            }
+                        }
+                    },
+
+                }
+            },
+
+        ]
+
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+           
+            for await (const doc of aggregateCursor) {
+                
+                mapArr.push(doc)
+            }
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+    //Popular playtime hours
+    // async PlayTimeHoursPop(collection) {
+    //     let mapArr = []
+    // const popularHoursMap2 = function () {
+    //     var hours_Arr = []
+    //     for (i = 0; i < this.play_dates.length; i++) {
+    //         var start_hour = this.play_dates[i].start_date.getUTCHours()
+    //         var hoursAmount = Math.round(Math.abs(this.play_dates[i].start_date - this.play_dates[i].end_date) / 36e5)
+
+    //         for (j = 0; j < hoursAmount; j++) {
+    //             hours_Arr.push((start_hour + j) % 24)
+    //         }
+    //     }
+    //     for (i = 0; i < hours_Arr.length; i++) {
+    //         emit(hours_Arr[i], 1)
+    //     }
+    // }
+    //     const pipeline = [
+    //         {
+    //            'consensus':
+    //         },
+    //         {
+    //             '$group': {
+    //                 '_id': { '$hour': { '$toDate': "$play_dates.start_date" } },
+    //                 'Value': {
+    //                     '$sum': {
+    //                         '$dateDiff':
+    //                         {
+    //                             'startDate': { '$toDate': "$play_dates.start_date" },
+    //                             'endDate': { '$toDate': "$play_dates.end_date" },
+    //                             'unit': "hour"
+    //                         }
+    //                     }
+    //                 },
+
+    //             }
+    //         },
+
+    //     ]
+    //     try {
+    //         await this.client.connect();
+    //         const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+    //         console.log(aggregateCursor)
+    //         for await (const doc of aggregateCursor) {
+    //             mapArr.push(doc)
+    //         }
+    //         return mapArr
+    //     }
+    //     catch (error) {
+    //         return error;
+    //     } finally {
+    //         await this.client.close();
+    //     }
+    // }
+    async example(collection) {
+        var popularHoursMapReduce2 = function () {
+            db.users.mapReduce(
+                popularHoursMap2,
+                popularHoursReduce2,
+                {
+                    out: "popular_hours_levels2"
+                }
+            )
+
+        }
+
+        var popularHoursMap2 = function () {
+            var hours_Arr = []
+            for (i = 0; i < this.play_dates.length; i++) {
+                var start_hour = this.play_dates[i].start_date.getUTCHours()
+                var hoursAmount = Math.round(Math.abs(this.play_dates[i].start_date - this.play_dates[i].end_date) / 36e5)
+
+                for (j = 0; j < hoursAmount; j++) {
+                    hours_Arr.push((start_hour + j) % 24)
+                }
+            }
+            for (i = 0; i < hours_Arr.length; i++) {
+                emit(hours_Arr[i], 1)
+            }
+        }
+
+
+        var popularHoursReduce2 = function (hours, values) {
+            hourCounter = 0
+            for (i = 0; i < values.length; i++) {
+                hourCounter += values[i]
+
+            }
+            return hourCounter;
+        }
+    }
+
+
+
     //optional, not in use right now!!
     //get avatar url by gender code:
     async FindByAvatarCode(collection, avatarToSearch, genderCode) {
@@ -149,7 +372,7 @@ class DB {
             await this.client.close();
         }
     }
-    async FindGuestByNickname(collection,nickName){
+    async FindGuestByNickname(collection, nickName) {
         try {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).findOne({ nickname: nickName });
@@ -294,7 +517,7 @@ class DB {
             await this.client.connect();
             return await this.client.db(this.dbName).collection(collection).updateOne(
                 { _id: ObjectId(id) },
-                { $push: { level_rank: { level_code: doc.level_code, rank: doc.rank,popularity:doc.popularity } } }
+                { $push: { level_rank: { level_code: doc.level_code, rank: doc.rank, popularity: doc.popularity } } }
             );
         }
         catch (error) {

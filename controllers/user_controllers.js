@@ -7,17 +7,7 @@ const UserRouter = require('express').Router();
 const auth = require("../middleware/auth");
 //CRUD
 
-//admin cruds
-//Read all
-UserRouter.get('/', async (req, res) => {
-  try {
-    let data = await new DB().FindAll("users");
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
+//user cruds
 //Read one
 UserRouter.get('/:id', async (req, res) => {
   try {
@@ -28,65 +18,6 @@ UserRouter.get('/:id', async (req, res) => {
     res.status(500).json({ error });
   }
 });
-// //check if i get avatars
-// UserRouter.get('/avatarCode/:code/:gender', async (req, res) => {
-//   try {
-//       let { code,gender } = req.params; //get the id param.
-//       let data = await new DB().FindByAvatarCode("avatars", code,gender);
-//       res.status(200).json(data);
-//   } catch (error) {
-//       res.status(500).json({ error });
-//   }
-// });
-//Create
-UserRouter.post('/add', async (req, res) => {
-  try {
-    let { nickname, email, password, avatars, gender } = req.body;
-    let user = new User(nickname, email, password, avatars, gender);
-    let data = await new DB().Insert("users", user);
-    res.status(201).json(data);
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-//Update
-UserRouter.put('/update/:id', async (req, res) => {
-  try {
-    let { id } = req.params;
-    let { nickname, email, password, current_level, level_rank, avatars, gender } = req.body;
-    let user = new User(nickname, email, password, current_level, level_rank, avatars, gender);
-    let data = await new DB().UpdateDocById("users", id, user);
-    res.status(201).json(data);
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-//Delete
-UserRouter.delete('/delete/:id', async (req, res) => {
-  try {
-    let { id } = req.params;
-    let data = await new DB().DeactivateDocById("users", id);
-    res.status(201).json(data);
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-//Reactive
-UserRouter.put('/reactive/:id', async (req, res) => {
-  try {
-    let { id } = req.params;
-    let data = await new DB().ReactivateDocById("users", id);
-    res.status(201).json(data);
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-
-//user cruds
 //Register
 UserRouter.post("/register", async (req, res) => {
 
@@ -302,7 +233,4 @@ UserRouter.post("/guestRegister", async (req, res) => {
 });
 
 
-// UserRouter.post("/welcome", auth, (req, res) => {
-//   res.status(200).send("Welcome 🙌 ");
-// });
 module.exports = UserRouter;

@@ -21,10 +21,13 @@
   },
   "homepage": "https://github.com/bloodwarriorr/The-Last-Fugitive#readme",
   "dependencies": {
+    "@firebase/auth": "^0.20.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "firebase": "^9.9.4",
+    "firebase-admin": "^11.0.1",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.6.0",

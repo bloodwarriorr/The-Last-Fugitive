@@ -1,0 +1,355 @@
+const DB = require('../utils/db');
+const AdminRouter = require('express').Router();
+const adminAuth = require("../middleware/authAdmin");
+
+//init firebase app
+const {initializeApp }=require('firebase/app')
+const {getAuth,signInWithEmailAndPassword}=require('@firebase/auth')
+
+const firebaseConfig = {
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN,
+    projectId: process.env.PROJECT_ID,
+    storageBucket: process.env.STORAGE_BUCKET,
+    messagingSenderId: process.env.MESSAGING_SENDER_ID,
+    appId: process.env.APP_ID,
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth=getAuth(app)
+
+
+AdminRouter.post('/signUp', async (req, res) => {
+
+    const credentials = {
+        email: req.body.email,
+        password: req.body.password
+    }
+    try {
+        const loggedInAdmin = await signInWithEmailAndPassword(auth, credentials.email, credentials.password)
+        
+        if (loggedInAdmin) {
+            res.status(200).json(loggedInAdmin.user.uid)
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
+AdminRouter.post('/popularLevels',adminAuth,async (req, res) => {
+    try{
+    const popularLevels=await new DB().PopularLevelMapReduce("users")
+    console.log(popularLevels)
+    if(popularLevels){
+        return res.status(200).json(popularLevels)
+    }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
+
+AdminRouter.post('/TotalRegistration',adminAuth,async (req, res) => {
+    try{
+    const amountOfRegisteration=await new DB().AmountOfRegestation("users",req.body.year)
+    if(amountOfRegisteration){
+        return res.status(200).json(amountOfRegisteration)
+    }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
+AdminRouter.post('/LevelRankAvg',adminAuth,async (req, res) => {
+    try{
+    const levelRankingAvg=await new DB().LevelRankningAvg("users")
+    if(levelRankingAvg){
+        return res.status(200).json(levelRankingAvg)
+    }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+});
+AdminRouter.post('/popHours',adminAuth,async (req, res) => {
+    try{
+    const popularHours=await new DB().PlayTimeHoursPop("users")
+    if(popularHours){
+        return res.status(200).json(popularHours)
+    }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
+//users controllers
+AdminRouter.post('/users/add',adminAuth, async (req, res) => {
+    try {
+      let { nickname, email, password, avatars, gender } = req.body;
+      let user = new User(nickname, email, password, avatars, gender);
+      let data = await new DB().Insert("users", user);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  //Update
+  AdminRouter.put('/users/update/:id',adminAuth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let { nickname, email, password, current_level, level_rank, avatars, gender } = req.body;
+      let user = new User(nickname, email, password, current_level, level_rank, avatars, gender);
+      let data = await new DB().UpdateDocById("users", id, user);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  //Delete
+  AdminRouter.delete('/users/delete/:id',adminAuth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().DeactivateDocById("users", id);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  
+  //Reactive
+  AdminRouter.put('/users/reactive/:id',adminAuth, async (req, res) => {
+    try {
+      let { id } = req.params;
+      let data = await new DB().ReactivateDocById("users", id);
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+  //Read all
+  AdminRouter.get('/users/',adminAuth, async (req, res) => {
+    try {
+      let data = await new DB().FindAll("users");
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+
+  //levels controllers
+  //Read one
+  AdminRouter.get('/levels/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params; //get the id param.
+        let data = await new DB().FindByID("levels", id);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Create
+AdminRouter.post('/levels/add',adminAuth, async (req, res) => {
+    try {
+        let { code,map,player,enemies,step_cap,difficulty } = req.body;
+        let level = new Level(code,map,player,enemies,step_cap,difficulty);
+        let data = await new DB().Insert("levels", level);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Update
+AdminRouter.put('/levels/update/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let { code, map,player,enemies,step_cap,difficulty } = req.body;
+        let level = new Level( code,map,player,enemies,step_cap,difficulty);
+        let data = await new DB().UpdateDocById("levels", id, level);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Delete
+AdminRouter.delete('/levels/delete/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().DeactivateDocById("levels", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Reactive
+AdminRouter.put('/levels/reactive/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().ReactivateDocById("levels", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//hints controllers
+//Read one
+AdminRouter.get('/hints/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params; //get the id param.
+        let data = await new DB().FindByID("hints", id);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Create
+AdminRouter.post('/hints/add',adminAuth, async (req, res) => {
+    try {
+        let { name,description } = req.body;
+        let hint = new Hint(name,description);
+        let data = await new DB().Insert("hints", hint);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Update
+AdminRouter.put('/hints/update/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let {  name,description } = req.body;
+        let hint = new Hint( name,description);
+        let data = await new DB().UpdateDocById("hints", id, hint);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Delete
+AdminRouter.delete('/hints/delete/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().DeactivateDocById("hints", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Reactive
+AdminRouter.put('/hints/reactive/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().ReactivateDocById("hints", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+//avatars
+//Read one
+AdminRouter.get('/avatars/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params; //get the id param.
+        let data = await new DB().FindByID("avatars", id);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Create
+AdminRouter.post('/avatars/add',adminAuth, async (req, res) => {
+    try {
+        let { gender,options } = req.body;
+        let avatar = new Avatar(gender,options);
+        let data = await new DB().Insert("avatars", avatar);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Update
+AdminRouter.put('/avatars/update/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let {  gender,options } = req.body;
+        let avatar = new Avatar( gender,options);
+        let data = await new DB().UpdateDocById("avatars", id, avatar);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+//remove option from avatar options
+AdminRouter.put('/avatars/update/avatarOption/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let {code} = req.body;
+        let data = await new DB().removeAvatarOption("avatars", id, code);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//add choice option in avatar option array
+AdminRouter.put('/avatars/update/addAvatarOption/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        
+        let data = await new DB().addAvatarOption("avatars", id, req.body);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+
+
+//Delete
+AdminRouter.delete('/avatars/delete/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().DeactivateDocById("avatars", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//Reactive
+AdminRouter.put('/avatars/reactive/:id',adminAuth, async (req, res) => {
+    try {
+        let { id } = req.params;
+        let data = await new DB().ReactivateDocById("avatars", id);
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//guest
+AdminRouter.get('/guests',adminAuth, async (req, res) => {
+    try {
+       //get the id param.
+      let data = await new DB().FindAll("guests");
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+module.exports = AdminRouter;

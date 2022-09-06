@@ -1,4 +1,3 @@
-const { User } = require("../models/user_model");
 const Token = require("../models/token");
 const DB = require('../utils/db');
 const sendEmail = require("../utils/sendEmail");
@@ -9,7 +8,7 @@ const bcrypt = require('bcryptjs');
 
 router.post("/reset", async (req, res) => {
     try {
-        let { email } = req.body; //get the id param.
+        let { email } = req.body; 
 
         let user = await new DB().FindByEmail("users", email);
         if (!user) {
