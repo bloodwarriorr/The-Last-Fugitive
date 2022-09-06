@@ -110,6 +110,26 @@ AdminRouter.post('/users/add', adminAuth, async (req, res) => {
     }
 });
 
+//get amount of users and guests registerd
+AdminRouter.get('/users/amountOfUsers/', adminAuth, async (req, res) => {
+    try {
+        let data = await new DB().FindAmount("users");
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+//get amount of users and guests registerd
+AdminRouter.get('/guests/amountOfGuests/', adminAuth, async (req, res) => {
+    try {
+        let data = await new DB().FindAmount("guests");
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
 //Update
 AdminRouter.put('/users/update/:id', adminAuth, async (req, res) => {
     try {

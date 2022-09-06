@@ -137,6 +137,19 @@ class DB {
         }
     }
 
+    //amount of users and guests
+    async FindAmount(collection) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).countDocuments();
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+
 
     //aggregate functions:
     //popular levels according to popularity rate
