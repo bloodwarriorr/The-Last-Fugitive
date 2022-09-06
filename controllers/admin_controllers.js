@@ -53,10 +53,10 @@ AdminRouter.get('/popularLevels', adminAuth, async (req, res) => {
 })
 
 
-AdminRouter.get('/TotalRegistration', adminAuth, async (req, res) => {
+AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
     try {
-        const amountOfRegisterationUsers = await new DB().AmountOfRegestation("users", req.body.year)
-        const amountOfRegisterationGuests = await new DB().AmountOfRegestation("guests", req.body.year)
+        const amountOfRegisterationUsers = await new DB().AmountOfRegestation("users", req.params.year)
+        const amountOfRegisterationGuests = await new DB().AmountOfRegestation("guests", req.params.year)
         const amountOfRegisteration = [...amountOfRegisterationUsers, ...amountOfRegisterationGuests]
         const result = amountOfRegisteration.reduce((acc, curr) => {
             const index = acc.findIndex(item => item._id === curr._id)
