@@ -159,7 +159,7 @@ class DB {
             { '$unwind': "$level_rank" },
             { '$group': { '_id': "$level_rank.level_code", 'Value': { '$sum': '$level_rank.popularity' } } },
             {'$sort':{'_id':1}},
-            { '$limit': 3 }
+            { '$limit': 5 }
         ]
         try {
             await this.client.connect();
