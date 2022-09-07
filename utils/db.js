@@ -254,7 +254,7 @@ class DB {
 
                 }
             },
-            {'$sort':{'_id':-1}}
+            {'$sort':{'_id':1}}
         ]
         try {
             await this.client.connect();
