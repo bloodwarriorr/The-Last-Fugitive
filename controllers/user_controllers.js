@@ -64,7 +64,6 @@ UserRouter.post("/register", async (req, res) => {
 //Login
 UserRouter.post("/login", async (req, res) => {
 
-  // Our login logic starts here
   try {
     // Get user input
     const { email, password } = req.body;
@@ -93,9 +92,50 @@ UserRouter.post("/login", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
-  // Our register logic ends here
 });
+//sign up user as guest
+UserRouter.post("/guestRegister", async (req, res) => {
 
+  try {
+
+    // Get user input
+    let { nickname, email, password,gender,id,avatarCode,avatarUrl } = req.body
+    const guest = await new DB().FindByID("guests", id)
+
+    // Validate user input
+    if (!(nickname && email && password&&avatarCode >= 0 && gender && avatarUrl)) {
+      return res.status(400).send("All input is required");
+    }
+
+    // check if user already exist
+    // Validate if user exist in our database
+    const oldUser = await new DB().FindByEmail("users", email);
+
+    if (oldUser) {
+      return res.status(409).send("User Already Exist. Please Login");
+    }
+
+    //Encrypt user password
+    encryptedPassword = await bcrypt.hash(password, 10);
+    // Create user in our database
+    let user = new User(nickname, email.toLowerCase(), encryptedPassword, avatarCode, gender, 
+    avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
+    // Create token
+    const token = jwt.sign(
+      { user_id: user._id, email },
+      process.env.TOKEN_KEY
+    );
+    // save user token
+    user.token = token;
+    await new DB().Insert("users", user);
+    // return new user
+    res.status(201).json(user);
+   await new DB().DeleteDocById("guests",guest._id)
+  } catch (err) {
+    console.log(err);
+  }
+
+});
 //following controllers require auth token:
 
 //update avatar
@@ -187,49 +227,6 @@ UserRouter.put('/update/addLevelRank/:id', auth, async (req, res) => {
   }
 });
 
-//sign up user as guest
-UserRouter.post("/guestRegister", async (req, res) => {
-
-  try {
-
-    // Get user input
-    let { nickname, email, password,gender,id,avatarCode,avatarUrl } = req.body
-    const guest = await new DB().FindByID("guests", id)
-
-    // Validate user input
-    if (!(nickname && email && password&&avatarCode >= 0 && gender && avatarUrl)) {
-      return res.status(400).send("All input is required");
-    }
-
-    // check if user already exist
-    // Validate if user exist in our database
-    const oldUser = await new DB().FindByEmail("users", email);
-
-    if (oldUser) {
-      return res.status(409).send("User Already Exist. Please Login");
-    }
-
-    //Encrypt user password
-    encryptedPassword = await bcrypt.hash(password, 10);
-    // Create user in our database
-    let user = new User(nickname, email.toLowerCase(), encryptedPassword, avatarCode, gender, 
-    avatarUrl,guest.level_rank,guest.current_level,guest.is_notification,guest.time_of_register,guest.play_dates);
-    // Create token
-    const token = jwt.sign(
-      { user_id: user._id, email },
-      process.env.TOKEN_KEY
-    );
-    // save user token
-    user.token = token;
-    await new DB().Insert("users", user);
-    // return new user
-    res.status(201).json(user);
-   await new DB().DeleteDocById("guests",guest._id)
-  } catch (err) {
-    console.log(err);
-  }
-
-});
 
 
 module.exports = UserRouter;
