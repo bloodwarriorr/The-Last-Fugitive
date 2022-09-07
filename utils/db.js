@@ -158,6 +158,7 @@ class DB {
         const pipeline = [
             { '$unwind': "$level_rank" },
             { '$group': { '_id': "$level_rank.level_code", 'Value': { '$sum': '$level_rank.popularity' } } },
+            {'$sort':{'_id':1}},
             { '$limit': 3 }
         ]
         try {
@@ -210,9 +211,12 @@ class DB {
             {
                 '$group': {
                     '_id': '$level_rank.level_code',
-                    'Value': { '$avg': { '$sum': '$level_rank.rank' } }
+                    'Value': { '$avg': { '$sum': '$level_rank.rank' }},
+                    
                 }
             },
+            {'$sort':{'_id':1}}
+           
 
         ]
         try {
@@ -250,15 +254,12 @@ class DB {
 
                 }
             },
-
+            {'$sort':{'_id':-1}}
         ]
-
         try {
             await this.client.connect();
             const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
-           
             for await (const doc of aggregateCursor) {
-                
                 mapArr.push(doc)
             }
             return mapArr

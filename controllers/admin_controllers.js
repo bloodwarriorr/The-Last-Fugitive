@@ -67,7 +67,7 @@ AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
             return acc
         }, [])
         if (result) {
-            return res.status(200).json(result)
+            return res.status(200).json(result.sort((a,b)=>a._id-b._id))
         }
     }
     catch (error) {
