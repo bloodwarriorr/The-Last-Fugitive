@@ -178,10 +178,10 @@ class DB {
     async AmountOfRegestation(collection, year) {
         let mapArr = []
         const pipeline = [
-            { '$match': { 'time_of_register': { '$gte': new Date(`${year}-01-01T08:16:53.126Z`) } } },
+            { '$match': { 'time_of_register': { '$gte': new Date(`${year}-01-01T00:00:00.000Z`),'$lte': new Date(`${year}-12-31T23:59:59.000Z`) } } },
             {
                 '$group': {
-                    '_id': { '$year':{'$toDate':"$time_of_register" } },
+                    '_id': { '$month':{'$toDate':"$time_of_register"} },
                     'Value': { '$sum': 1 }
                 },
               
