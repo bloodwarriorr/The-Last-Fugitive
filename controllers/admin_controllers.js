@@ -88,7 +88,7 @@ AdminRouter.get('/LevelRankAvg', adminAuth, async (req, res) => {
 });
 AdminRouter.get('/popHours', adminAuth, async (req, res) => {
     try {
-        const popularHours = await new DB().PlayTimeHoursPop("users")
+        const popularHours = await new DB().PlayTimePeriudPop("users")
         if (popularHours) {
             return res.status(200).json(popularHours)
         }
