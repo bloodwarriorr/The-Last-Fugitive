@@ -5,7 +5,6 @@ class Level {
     enemies;
     step_cap;
     difficulty;
-    popularity;
     end_point;
    
 
@@ -16,7 +15,6 @@ class Level {
         this.enemies=enemies
         this.step_cap=step_cap
         this.difficulty=difficulty
-        this.popularity=0
         this.end_point=end_point
 
     }
