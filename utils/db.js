@@ -61,6 +61,27 @@ class DB {
             await this.client.close();
         }
     }
+    async FindGuestByNickname(collection, nickName) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).findOne({ nickname: nickName });
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    };
+     //amount of users and guests
+     async FindAmount(collection) {
+        try {
+            await this.client.connect();
+            return await this.client.db(this.dbName).collection(collection).countDocuments();
+        } catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
     async Insert(collection, doc) {
         try {
             await this.client.connect();
@@ -137,20 +158,7 @@ class DB {
         }
     }
 
-    //amount of users and guests
-    async FindAmount(collection) {
-        try {
-            await this.client.connect();
-            return await this.client.db(this.dbName).collection(collection).countDocuments();
-        } catch (error) {
-            return error;
-        } finally {
-            await this.client.close();
-        }
-    }
-
-
-
+   
     //aggregate functions:
     //popular levels according to popularity rate
     async PopularLevelMapReduce(collection) {
@@ -272,43 +280,6 @@ class DB {
     }
 
    
-    // async example(collection) {
-    //     await this.client.connect();
-    //     this.client.db(this.dbName).collection(collection).mapReduce(
-    //         popularHoursMap2,
-    //         popularHoursReduce2,
-    //         {
-    //             out: "popular_hours_levels2"
-    //         }
-    //     );
-
-       
-
-    //     var popularHoursMap2 = function () {
-    //         var hours_Arr = []
-    //         for (i = 0; i < this.play_dates.length; i++) {
-    //             var start_hour = this.play_dates[i].start_date.getUTCHours()
-    //             var hoursAmount = Math.round(Math.abs(this.play_dates[i].start_date - this.play_dates[i].end_date) / 36e5)
-
-    //             for (j = 0; j < hoursAmount; j++) {
-    //                 hours_Arr.push((start_hour + j) % 24)
-    //             }
-    //         }
-    //         for (i = 0; i < hours_Arr.length; i++) {
-    //             emit(hours_Arr[i], 1)
-    //         }
-    //     }
-
-
-    //     var popularHoursReduce2 = function (hours, values) {
-    //         hourCounter = 0
-    //         for (i = 0; i < values.length; i++) {
-    //             hourCounter += values[i]
-
-    //         }
-    //         return hourCounter;
-    //     }
-    // }
 
 
 
@@ -335,16 +306,7 @@ class DB {
             await this.client.close();
         }
     }
-    async FindGuestByNickname(collection, nickName) {
-        try {
-            await this.client.connect();
-            return await this.client.db(this.dbName).collection(collection).findOne({ nickname: nickName });
-        } catch (error) {
-            return error;
-        } finally {
-            await this.client.close();
-        }
-    }
+  
     //update nickname in user doc
     async UpdateNickName(collection, id, doc) {
         try {

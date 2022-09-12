@@ -4,6 +4,7 @@ const Avatar = require('../models/avatar_model');
 const Hint = require('../models/hints_model');
 const AdminRouter = require('express').Router();
 const adminAuth = require("../middleware/authAdmin");
+const {loginRateLimiter}=require("../middleware/rateLimiter")
 
 //init firebase app
 const { initializeApp } = require('firebase/app')
@@ -21,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app)
 
 
-AdminRouter.post('/signUp', async (req, res) => {
+AdminRouter.post('/signUp',loginRateLimiter, async (req, res) => {
 
     const credentials = {
         email: req.body.email,
