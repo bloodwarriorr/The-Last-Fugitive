@@ -160,6 +160,45 @@ class DB {
 
    
     //aggregate functions:
+    //total playtime
+    async TotalPlayTime(collection) {
+        let mapArr = []
+        const pipeline = [
+            { '$unwind': '$play_dates' },
+            {
+                '$group': {
+                    '_id': {'$hour':{'$toDate':"$play_dates.start_date"}},
+                    'Amount': {
+                        '$sum': {
+                            '$dateDiff':
+                            {
+                               'startDate': {'$toDate':"$play_dates.start_date"},
+                               'endDate': {'$toDate':"$play_dates.end_date"},
+                               'unit': "hour"
+                            }
+                        }
+                    },
+
+                }
+            },
+            {'$sort':{'_id':1}}
+        ]
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+            for await (const doc of aggregateCursor) {
+                mapArr.push(doc)
+            }
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+
     //total popular avg of game
     async TotalLevelPopularityAvg(collection) {
         let mapArr = []
@@ -184,11 +223,6 @@ class DB {
             await this.client.close();
         }
     }
-
-
-
-
-
 
 
     //popular levels according to popularity rate
@@ -309,10 +343,6 @@ class DB {
             await this.client.close();
         }
     }
-
-   
-
-
 
     //optional, not in use right now!!
     //get avatar url by gender code:

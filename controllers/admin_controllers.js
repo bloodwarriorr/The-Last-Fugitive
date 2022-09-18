@@ -117,6 +117,19 @@ AdminRouter.get('/popHours', adminAuth, async (req, res) => {
     }
 })
 
+AdminRouter.get('/TotalPlayTime', adminAuth, async (req, res) => {
+    try {
+        const popularHours = await new DB().TotalPlayTime("users")
+        const totalAmount=popularHours.reduce((a,b)=>{return a+b.Amount},0)
+        if (totalAmount) {
+            return res.status(200).json(totalAmount)
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
 //users controllers
 AdminRouter.post('/users/add', adminAuth, async (req, res) => {
     try {
