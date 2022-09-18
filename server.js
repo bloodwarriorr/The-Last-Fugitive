@@ -29,5 +29,6 @@ server.use('/api/avatars', require('./controllers/avatar_controller'));
 server.use('/api/guests', require('./controllers/guest_controller'));
 server.use("/api/password-reset", passwordReset);
 server.use("/api/admin",require("./controllers/admin_controllers"))
+server.use("/api/life",require("./controllers/life_controller"))
 
 server.listen(PORT, () => console.log(`http://localhost:${PORT}`));

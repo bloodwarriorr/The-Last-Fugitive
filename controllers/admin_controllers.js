@@ -53,6 +53,24 @@ AdminRouter.get('/popularLevels', adminAuth, async (req, res) => {
     }
 })
 
+//total popular avg levels
+AdminRouter.get('/TotalPopularAvg', adminAuth, async (req, res) => {
+    try {
+        const popularLevels = await new DB().TotalLevelPopularityAvg("users")
+        const totalPersons=popularLevels.reduce((curr,b)=>{return curr + b.persons},0)
+        const totalAvg = popularLevels.reduce((curr,b)=>{return curr + (b.persons/totalPersons*b.lvlAvg)},0);
+        
+        if (totalAvg) {
+            return res.status(200).send(totalAvg.toFixed(2))
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error });
+    }
+})
+
+
+
 
 AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
     try {
@@ -393,4 +411,28 @@ AdminRouter.get('/guests', adminAuth, async (req, res) => {
         res.status(500).json({ error });
     }
 });
+
+AdminRouter.get("/lifes", adminAuth,async (req, res) => {
+    try {
+      let data = await new DB().FindAll("life");
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+
+  AdminRouter.put("/updateLife", adminAuth,async (req, res) => {
+    try {
+      let{userAmount,guestAmount}=req.body
+      let data = await new DB().FindAll("life");
+      data[0].addedLifeForRegister.amount=userAmount
+      data[0].addedLifeForGuest.amount=guestAmount
+      const updatedData=await new DB().UpdateDocById("life",data._id,data[0])
+      res.status(200).json(updatedData);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+
+
 module.exports = AdminRouter;

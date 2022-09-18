@@ -160,6 +160,37 @@ class DB {
 
    
     //aggregate functions:
+    //total popular avg of game
+    async TotalLevelPopularityAvg(collection) {
+        let mapArr = []
+        const pipeline = [
+            { '$unwind': "$level_rank" },
+            { '$group': { '_id': "$level_rank.level_code",
+             'persons': {'$sum': 1},
+             'lvlAvg':{'$avg':{'$sum':['$level_rank.popularity',1]}} } },
+            {'$sort':{'_id':1}},
+            { '$limit': 5 }
+        ]
+        try {
+            await this.client.connect();
+            const aggregateCursor = this.client.db(this.dbName).collection(collection).aggregate(pipeline)
+            for await (const doc of aggregateCursor)
+                mapArr.push(doc)
+            return mapArr
+        }
+        catch (error) {
+            return error;
+        } finally {
+            await this.client.close();
+        }
+    }
+
+
+
+
+
+
+
     //popular levels according to popularity rate
     async PopularLevelMapReduce(collection) {
         let mapArr = []
