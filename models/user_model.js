@@ -8,7 +8,7 @@ class User {
     time_of_register;
     play_dates;
     avatarUrl;
-   
+    isActive;
 
     constructor(nickname, email,password,avatarCode,gender,avatarUrl,level_rank=[],current_level=1,is_notification=true,time_of_register=new Date(),play_dates=[]){
         this.nickname=nickname;
@@ -22,7 +22,7 @@ class User {
         this.is_notification=is_notification;
         this.time_of_register=time_of_register;
         this.play_dates=play_dates
-
+        this.isActive=true;
     }
 }
 

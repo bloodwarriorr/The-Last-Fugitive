@@ -176,7 +176,7 @@ AdminRouter.put('/users/update/:id', adminAuth, async (req, res) => {
 });
 
 //Delete
-AdminRouter.delete('/users/delete/:id', adminAuth, async (req, res) => {
+AdminRouter.put('/users/delete/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
         let data = await new DB().DeactivateDocById("users", id);
