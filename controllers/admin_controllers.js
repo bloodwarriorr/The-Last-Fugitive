@@ -436,10 +436,10 @@ AdminRouter.get("/lifes", adminAuth,async (req, res) => {
 
   AdminRouter.put("/updateLife", adminAuth,async (req, res) => {
     try {
-      let{userAmount,guestAmount}=req.body
+      let{user,guest}=req.body
       let data = await new DB().FindAll("life");
-      data[0].addedLifeForRegister.amount=userAmount
-      data[0].addedLifeForGuest.amount=guestAmount
+      data[0].addedLifeForRegister=user
+      data[0].addedLifeForGuest=guest
       const updatedData=await new DB().UpdateDocById("life",data._id,data[0])
       res.status(200).json(updatedData);
     } catch (error) {
