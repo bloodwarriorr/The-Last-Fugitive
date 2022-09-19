@@ -122,7 +122,7 @@ AdminRouter.get('/TotalPlayTime', adminAuth, async (req, res) => {
         const popularHours = await new DB().TotalPlayTime("users")
         const totalAmount=popularHours.reduce((a,b)=>{return a+b.Amount},0)
         if (totalAmount) {
-            return res.status(200).send(totalAmount)
+            return res.status(200).json(totalAmount)
         }
     }
     catch (error) {
