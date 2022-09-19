@@ -122,7 +122,7 @@ AdminRouter.get('/TotalPlayTime', adminAuth, async (req, res) => {
         const popularHours = await new DB().TotalPlayTime("users")
         const totalAmount=popularHours.reduce((a,b)=>{return a+b.Amount},0)
         if (totalAmount) {
-            return res.status(200).json(totalAmount)
+            return res.status(200).send(totalAmount)
         }
     }
     catch (error) {
@@ -436,10 +436,10 @@ AdminRouter.get("/lifes", adminAuth,async (req, res) => {
 
   AdminRouter.put("/updateLife", adminAuth,async (req, res) => {
     try {
-      let{user,guest}=req.body
+      let{lifeObj}=req.body
       let data = await new DB().FindAll("life");
-      data[0].addedLifeForRegister=user
-      data[0].addedLifeForGuest=guest
+      data[0].addedLifeForRegister=lifeObj.user
+      data[0].addedLifeForGuest=lifeObj.guest
       const updatedData=await new DB().UpdateDocById("life",data._id,data[0])
       res.status(200).json(updatedData);
     } catch (error) {
