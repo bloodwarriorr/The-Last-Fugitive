@@ -5,20 +5,24 @@ const LifeRouter = require("express").Router();
 LifeRouter.get("/client", async (req, res) => {
   try {
     const data = await new DB().FindAll("life");
-   
+
     if (data[0].addedLifeForRegister.dueTo) {
-       
-      if (data[0].addedLifeForRegister.dueTo >= new Date())
-      data[0].registeredUserLife+=data[0].addedLifeForRegister.amount;
+
+      if (new Date(data[0].addedLifeForRegister.dueTo) >= new Date()) {
+        
+        data[0].registeredUserLife += data[0].addedLifeForRegister.amount;
+      }
     }
     if (data[0].addedLifeForGuest.dueTo) {
+
+      if (new Date(data[0].addedLifeForGuest.dueTo) >= new Date()) {
        
-      if (data[0].addedLifeForGuest.dueTo >= new Date())
-      data[0].addedLifeForGuest+=data[0].addedLifeForGuest.amount;
+        data[0].guestUserLife += data[0].addedLifeForGuest.amount;
+      }
     }
 
     let lifeObj = { user: data[0].registeredUserLife, guest: data[0].guestUserLife };
-    
+
     res.status(200).json(lifeObj);
   } catch (error) {
     res.status(500).json({ error });
