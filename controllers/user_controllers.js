@@ -76,6 +76,7 @@ UserRouter.post("/login", async (req, res) => {
     const user = await new DB().FindByEmail("users", email);
     
     if (user && (await bcrypt.compare(password, user.password))) {
+      if(!user.isActive){return res.status(403).send("User is Banned!!")}
       // Create token
       const token = jwt.sign(
         { user_id: user._id, email },
@@ -88,7 +89,6 @@ UserRouter.post("/login", async (req, res) => {
       // user
       res.status(200).json(user);
     }
-    if(!user.isActive){return res.status(403).send("User is Banned!!")}
     res.status(400).send("Invalid Credentials");
   } catch (err) {
     console.log(err);
