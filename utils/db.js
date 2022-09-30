@@ -207,8 +207,7 @@ class DB {
             { '$group': { '_id': "$level_rank.level_code",
              'persons': {'$sum': 1},
              'lvlAvg':{'$avg':{'$sum':['$level_rank.popularity',1]}} } },
-            {'$sort':{'_id':1}},
-            { '$limit': 5 }
+            {'$sort':{'_id':1}}
         ]
         try {
             await this.client.connect();
