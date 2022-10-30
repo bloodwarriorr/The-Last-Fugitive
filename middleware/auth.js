@@ -21,6 +21,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).send("Invalid Token");
   }
   //מעבר לפעולה הבאה-עברנו את שכבת אותנטיקציה ונפעיל את הפעולה הבאה.
+  
   return next();
 };
 
