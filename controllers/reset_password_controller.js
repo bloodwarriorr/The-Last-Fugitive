@@ -1,6 +1,8 @@
 
 const Token = require("../models/token");
-const DB = require('../utils/db');
+// const DB = require('../utils/db');
+const DBSingleton = require('../utils/db-singleton');
+const DB = DBSingleton.getInstance();
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const express = require("express");
@@ -11,15 +13,15 @@ router.post("/reset", async (req, res) => {
     try {
         let { email } = req.body; 
 
-        let user = await new DB().FindByEmail("users", email);
+        let user = await DB.FindByEmail("users", email);
         if (!user) {
             return res.status(400).send("User not found!");
         }
-        let token = await new DB().FindByUserId("token", user._id.toString())
+        let token = await DB.FindByUserId("token", user._id.toString())
 
         if (!token) {
             token = new Token(user._id, crypto.randomBytes(32).toString("hex"))
-            await new DB().Insert("token", token);
+            await DB.Insert("token", token);
         }
      
         const link = `${process.env.BASE_URL}/password-reset/?id=${user._id}&token=${token.token}`;
@@ -32,14 +34,14 @@ router.post("/reset", async (req, res) => {
 });
 router.post("/:userId/:token", async (req, res) => {
     try {
-        const user = await new DB().FindByID("users", req.params.userId);
+        const user = await DB.FindByID("users", req.params.userId);
         if (!user) return res.status(400).send("invalid link or expired");
-        const token = await new DB().FindByUserId("token", user._id.toString())
+        const token = await DB.FindByUserId("token", user._id.toString())
         if (!token) return res.status(400).send("Invalid link or expired");
         encryptedPassword = await bcrypt.hash(req.body.password, 10);
         user.password = encryptedPassword
-        await new DB().UpdateDocById("users", user._id, user)
-        await new DB().DeleteDocById("token", token._id.toString())
+        await DB.UpdateDocById("users", user._id, user)
+        await DB.DeleteDocById("token", token._id.toString())
         res.send("password reset sucessfully.");
     } catch (error) {
         return res.status(400).send("Something went wrong during reset password");

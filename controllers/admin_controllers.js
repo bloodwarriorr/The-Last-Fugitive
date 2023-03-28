@@ -1,10 +1,12 @@
-const DB = require('../utils/db');
+// const DB = require('../utils/db');
+const DBSingleton = require('../utils/db-singleton');
+const DB = DBSingleton.getInstance();
 const Level = require('../models/levels_model');
 const Avatar = require('../models/avatar_model');
 const Hint = require('../models/hints_model');
 const AdminRouter = require('express').Router();
 const adminAuth = require("../middleware/authAdmin");
-const {loginRateLimiter}=require("../middleware/rateLimiter")
+const { loginRateLimiter } = require("../middleware/rateLimiter")
 
 //init firebase app
 const { initializeApp } = require('firebase/app')
@@ -22,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app)
 
 
-AdminRouter.post('/signUp',loginRateLimiter, async (req, res) => {
+AdminRouter.post('/signUp', loginRateLimiter, async (req, res) => {
 
     const credentials = {
         email: req.body.email,
@@ -42,7 +44,7 @@ AdminRouter.post('/signUp',loginRateLimiter, async (req, res) => {
 
 AdminRouter.get('/popularLevels', adminAuth, async (req, res) => {
     try {
-        const popularLevels = await new DB().PopularLevelMapReduce("users")
+        const popularLevels = await DB.PopularLevelMapReduce("users")
         console.log(popularLevels)
         if (popularLevels) {
             return res.status(200).json(popularLevels)
@@ -56,10 +58,10 @@ AdminRouter.get('/popularLevels', adminAuth, async (req, res) => {
 //total popular avg levels
 AdminRouter.get('/TotalPopularAvg', adminAuth, async (req, res) => {
     try {
-        const popularLevels = await new DB().TotalLevelPopularityAvg("users")
-        const totalPersons=popularLevels.reduce((curr,b)=>{return curr + b.persons},0)
-        const totalAvg = popularLevels.reduce((curr,b)=>{return curr + (b.persons/totalPersons*b.lvlAvg)},0);
-        
+        const popularLevels = await DB.TotalLevelPopularityAvg("users")
+        const totalPersons = popularLevels.reduce((curr, b) => { return curr + b.persons }, 0)
+        const totalAvg = popularLevels.reduce((curr, b) => { return curr + (b.persons / totalPersons * b.lvlAvg) }, 0);
+
         if (totalAvg) {
             return res.status(200).send(totalAvg.toFixed(2))
         }
@@ -74,8 +76,8 @@ AdminRouter.get('/TotalPopularAvg', adminAuth, async (req, res) => {
 
 AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
     try {
-        const amountOfRegisterationUsers = await new DB().AmountOfRegestation("users", req.params.year)
-        const amountOfRegisterationGuests = await new DB().AmountOfRegestation("guests", req.params.year)
+        const amountOfRegisterationUsers = await DB.AmountOfRegestation("users", req.params.year)
+        const amountOfRegisterationGuests = await DB.AmountOfRegestation("guests", req.params.year)
         const amountOfRegisteration = [...amountOfRegisterationUsers, ...amountOfRegisterationGuests]
         const result = amountOfRegisteration.reduce((acc, curr) => {
             const index = acc.findIndex(item => item._id === curr._id)
@@ -86,7 +88,7 @@ AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
             return acc
         }, [])
         if (result) {
-            return res.status(200).json(result.sort((a,b)=>a._id-b._id))
+            return res.status(200).json(result.sort((a, b) => a._id - b._id))
         }
     }
     catch (error) {
@@ -96,7 +98,7 @@ AdminRouter.get('/TotalRegistration/:year', adminAuth, async (req, res) => {
 
 AdminRouter.get('/LevelRankAvg', adminAuth, async (req, res) => {
     try {
-        const levelRankingAvg = await new DB().LevelRankningAvg("users")
+        const levelRankingAvg = await DB.LevelRankningAvg("users")
         if (levelRankingAvg) {
             return res.status(200).json(levelRankingAvg)
         }
@@ -107,7 +109,7 @@ AdminRouter.get('/LevelRankAvg', adminAuth, async (req, res) => {
 });
 AdminRouter.get('/popHours', adminAuth, async (req, res) => {
     try {
-        const popularHours = await new DB().PlayTimePeriudPop("users")
+        const popularHours = await DB.PlayTimePeriudPop("users")
         if (popularHours) {
             return res.status(200).json(popularHours)
         }
@@ -119,8 +121,8 @@ AdminRouter.get('/popHours', adminAuth, async (req, res) => {
 
 AdminRouter.get('/TotalPlayTime', adminAuth, async (req, res) => {
     try {
-        const popularHours = await new DB().TotalPlayTime("users")
-        const totalAmount=popularHours.reduce((a,b)=>{return a+b.Amount},0)
+        const popularHours = await DB.TotalPlayTime("users")
+        const totalAmount = popularHours.reduce((a, b) => { return a + b.Amount }, 0)
         if (totalAmount) {
             return res.status(200).json(totalAmount)
         }
@@ -135,7 +137,7 @@ AdminRouter.post('/users/add', adminAuth, async (req, res) => {
     try {
         let { nickname, email, password, avatars, gender } = req.body;
         let user = new User(nickname, email, password, avatars, gender);
-        let data = await new DB().Insert("users", user);
+        let data = await DB.Insert("users", user);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -145,7 +147,7 @@ AdminRouter.post('/users/add', adminAuth, async (req, res) => {
 //get amount of users and guests registerd
 AdminRouter.get('/users/amountOfUsers/', adminAuth, async (req, res) => {
     try {
-        let data = await new DB().FindAmount("users");
+        let data = await DB.FindAmount("users");
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -155,7 +157,7 @@ AdminRouter.get('/users/amountOfUsers/', adminAuth, async (req, res) => {
 //get amount of users and guests registerd
 AdminRouter.get('/guests/amountOfGuests/', adminAuth, async (req, res) => {
     try {
-        let data = await new DB().FindAmount("guests");
+        let data = await DB.FindAmount("guests");
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -168,7 +170,7 @@ AdminRouter.put('/users/update/:id', adminAuth, async (req, res) => {
         let { id } = req.params;
         let { nickname, email, password, current_level, level_rank, avatars, gender } = req.body;
         let user = new User(nickname, email, password, current_level, level_rank, avatars, gender);
-        let data = await new DB().UpdateDocById("users", id, user);
+        let data = await DB.UpdateDocById("users", id, user);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -179,7 +181,7 @@ AdminRouter.put('/users/update/:id', adminAuth, async (req, res) => {
 AdminRouter.put('/users/delete/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().DeactivateDocById("users", id);
+        let data = await DB.DeactivateDocById("users", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -190,7 +192,7 @@ AdminRouter.put('/users/delete/:id', adminAuth, async (req, res) => {
 AdminRouter.put('/users/reactive/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().ReactivateDocById("users", id);
+        let data = await DB.ReactivateDocById("users", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -199,7 +201,7 @@ AdminRouter.put('/users/reactive/:id', adminAuth, async (req, res) => {
 //Read all
 AdminRouter.get('/users/', adminAuth, async (req, res) => {
     try {
-        let data = await new DB().FindAll("users");
+        let data = await DB.FindAll("users");
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -211,7 +213,7 @@ AdminRouter.get('/users/', adminAuth, async (req, res) => {
 AdminRouter.get('/levels/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params; //get the id param.
-        let data = await new DB().FindByID("levels", id);
+        let data = await DB.FindByID("levels", id);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -219,7 +221,7 @@ AdminRouter.get('/levels/:id', adminAuth, async (req, res) => {
 });
 AdminRouter.get('/levels', adminAuth, async (req, res) => {
     try {
-        let data = await new DB().FindAll("levels");
+        let data = await DB.FindAll("levels");
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -230,7 +232,7 @@ AdminRouter.post('/levels/add', adminAuth, async (req, res) => {
     try {
         let { code, map, player, enemies, step_cap, difficulty, end_point } = req.body;
         let level = new Level(code, map, player, enemies, step_cap, difficulty, end_point);
-        let data = await new DB().Insert("levels", level);
+        let data = await DB.Insert("levels", level);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -243,7 +245,7 @@ AdminRouter.put('/levels/update/:id', adminAuth, async (req, res) => {
         let { id } = req.params;
         let { code, map, player, enemies, step_cap, difficulty } = req.body;
         let level = new Level(code, map, player, enemies, step_cap, difficulty);
-        let data = await new DB().UpdateDocById("levels", id, level);
+        let data = await DB.UpdateDocById("levels", id, level);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -254,7 +256,7 @@ AdminRouter.put('/levels/update/:id', adminAuth, async (req, res) => {
 AdminRouter.delete('/levels/delete/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().DeactivateDocById("levels", id);
+        let data = await DB.DeactivateDocById("levels", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -265,7 +267,7 @@ AdminRouter.delete('/levels/delete/:id', adminAuth, async (req, res) => {
 AdminRouter.put('/levels/reactive/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().ReactivateDocById("levels", id);
+        let data = await DB.ReactivateDocById("levels", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -277,7 +279,7 @@ AdminRouter.put('/levels/reactive/:id', adminAuth, async (req, res) => {
 AdminRouter.get('/hints/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params; //get the id param.
-        let data = await new DB().FindByID("hints", id);
+        let data = await DB.FindByID("hints", id);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -289,7 +291,7 @@ AdminRouter.post('/hints/add', adminAuth, async (req, res) => {
     try {
         let { name, description } = req.body;
         let hint = new Hint(name, description);
-        let data = await new DB().Insert("hints", hint);
+        let data = await DB.Insert("hints", hint);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -302,7 +304,7 @@ AdminRouter.put('/hints/update/:id', adminAuth, async (req, res) => {
         let { id } = req.params;
         let { name, description } = req.body;
         let hint = new Hint(name, description);
-        let data = await new DB().UpdateDocById("hints", id, hint);
+        let data = await DB.UpdateDocById("hints", id, hint);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -313,7 +315,7 @@ AdminRouter.put('/hints/update/:id', adminAuth, async (req, res) => {
 AdminRouter.delete('/hints/delete/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().DeactivateDocById("hints", id);
+        let data = await DB.DeactivateDocById("hints", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -324,7 +326,7 @@ AdminRouter.delete('/hints/delete/:id', adminAuth, async (req, res) => {
 AdminRouter.put('/hints/reactive/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().ReactivateDocById("hints", id);
+        let data = await DB.ReactivateDocById("hints", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -335,7 +337,7 @@ AdminRouter.put('/hints/reactive/:id', adminAuth, async (req, res) => {
 AdminRouter.get('/avatars/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params; //get the id param.
-        let data = await new DB().FindByID("avatars", id);
+        let data = await DB.FindByID("avatars", id);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -347,7 +349,7 @@ AdminRouter.post('/avatars/add', adminAuth, async (req, res) => {
     try {
         let { gender, options } = req.body;
         let avatar = new Avatar(gender, options);
-        let data = await new DB().Insert("avatars", avatar);
+        let data = await DB.Insert("avatars", avatar);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -360,7 +362,7 @@ AdminRouter.put('/avatars/update/:id', adminAuth, async (req, res) => {
         let { id } = req.params;
         let { gender, options } = req.body;
         let avatar = new Avatar(gender, options);
-        let data = await new DB().UpdateDocById("avatars", id, avatar);
+        let data = await DB.UpdateDocById("avatars", id, avatar);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -371,7 +373,7 @@ AdminRouter.put('/avatars/update/avatarOption/:id', adminAuth, async (req, res) 
     try {
         let { id } = req.params;
         let { code } = req.body;
-        let data = await new DB().removeAvatarOption("avatars", id, code);
+        let data = await DB.removeAvatarOption("avatars", id, code);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -383,7 +385,7 @@ AdminRouter.put('/avatars/update/addAvatarOption/:id', adminAuth, async (req, re
     try {
         let { id } = req.params;
 
-        let data = await new DB().addAvatarOption("avatars", id, req.body);
+        let data = await DB.addAvatarOption("avatars", id, req.body);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -396,7 +398,7 @@ AdminRouter.put('/avatars/update/addAvatarOption/:id', adminAuth, async (req, re
 AdminRouter.delete('/avatars/delete/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().DeactivateDocById("avatars", id);
+        let data = await DB.DeactivateDocById("avatars", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -407,7 +409,7 @@ AdminRouter.delete('/avatars/delete/:id', adminAuth, async (req, res) => {
 AdminRouter.put('/avatars/reactive/:id', adminAuth, async (req, res) => {
     try {
         let { id } = req.params;
-        let data = await new DB().ReactivateDocById("avatars", id);
+        let data = await DB.ReactivateDocById("avatars", id);
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({ error });
@@ -418,35 +420,35 @@ AdminRouter.put('/avatars/reactive/:id', adminAuth, async (req, res) => {
 AdminRouter.get('/guests', adminAuth, async (req, res) => {
     try {
         //get the id param.
-        let data = await new DB().FindAll("guests");
+        let data = await DB.FindAll("guests");
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error });
     }
 });
 
-AdminRouter.get("/lifes", adminAuth,async (req, res) => {
+AdminRouter.get("/lifes", adminAuth, async (req, res) => {
     try {
-      let data = await new DB().FindAll("life");
-      res.status(200).json(data);
+        let data = await DB.FindAll("life");
+        res.status(200).json(data);
     } catch (error) {
-      res.status(500).json({ error });
+        res.status(500).json({ error });
     }
-  });
+});
 
-  AdminRouter.put("/updateLife", adminAuth,async (req, res) => {
+AdminRouter.put("/updateLife", adminAuth, async (req, res) => {
     try {
-      let lifeObj=req.body
-     
-      let data = await new DB().FindAll("life");
-      data[0].addedLifeForRegister=lifeObj.user
-      data[0].addedLifeForGuest=lifeObj.guest
-      const updatedData=await new DB().UpdateDocById("life",data[0]._id,data[0])
-      res.status(200).json(updatedData);
+        let lifeObj = req.body
+
+        let data = await DB.FindAll("life");
+        data[0].addedLifeForRegister = lifeObj.user
+        data[0].addedLifeForGuest = lifeObj.guest
+        const updatedData = await DB.UpdateDocById("life", data[0]._id, data[0])
+        res.status(200).json(updatedData);
     } catch (error) {
-      res.status(500).json({ error });
+        res.status(500).json({ error });
     }
-  });
+});
 
 
 module.exports = AdminRouter;

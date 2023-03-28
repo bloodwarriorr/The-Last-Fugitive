@@ -1,5 +1,7 @@
 const User = require('../models/user_model');
-const DB = require('../utils/db');
+// const DB = require('../utils/db');
+const DBSingleton = require('../utils/db-singleton');
+const DB = DBSingleton.getInstance();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserRouter = require('express').Router();
@@ -11,7 +13,7 @@ const auth = require("../middleware/auth");
 UserRouter.get('/:id', async (req, res) => {
   try {
     let { id } = req.params; //get the id param.
-    let data = await new DB().FindByID("users", id);
+    let data = await DB.FindByID("users", id);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -32,7 +34,7 @@ UserRouter.post("/register", async (req, res) => {
 
     // check if user already exist
     // Validate if user exist in our database
-    const oldUser = await new DB().FindByEmail("users", email);
+    const oldUser = await DB.FindByEmail("users", email);
 
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
@@ -50,7 +52,7 @@ UserRouter.post("/register", async (req, res) => {
     );
     // save user token
     user.token = token;
-    await new DB().Insert("users", user);
+    await DB.Insert("users", user);
 
 
 
@@ -73,7 +75,7 @@ UserRouter.post("/login", async (req, res) => {
       res.status(400).send("All input is required");
     }
     // Validate if user exist in our database
-    const user = await new DB().FindByEmail("users", email);
+    const user = await DB.FindByEmail("users", email);
     
     if (user && (await bcrypt.compare(password, user.password))) {
       if(!user.isActive){return res.status(403).send("User is Banned!!")}
@@ -101,7 +103,7 @@ UserRouter.post("/guestRegister", async (req, res) => {
 
     // Get user input
     let { nickname, email, password,gender,id,avatarCode,avatarUrl } = req.body
-    const guest = await new DB().FindByID("guests", id)
+    const guest = await DB.FindByID("guests", id)
 
     // Validate user input
     if (!(nickname && email && password&&avatarCode >= 0 && gender && avatarUrl)) {
@@ -110,7 +112,7 @@ UserRouter.post("/guestRegister", async (req, res) => {
 
     // check if user already exist
     // Validate if user exist in our database
-    const oldUser = await new DB().FindByEmail("users", email);
+    const oldUser = await DB.FindByEmail("users", email);
 
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
@@ -128,10 +130,10 @@ UserRouter.post("/guestRegister", async (req, res) => {
     );
     // save user token
     user.token = token;
-    await new DB().Insert("users", user);
+    await DB.Insert("users", user);
     // return new user
     res.status(201).json(user);
-   await new DB().DeleteDocById("guests",guest._id)
+   await DB.DeleteDocById("guests",guest._id)
   } catch (err) {
     console.log(err);
   }
@@ -144,7 +146,7 @@ UserRouter.put('/update/avatar/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
 
-    let data = await new DB().UpdateAvatar("users", id, req.body);
+    let data = await DB.UpdateAvatar("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -155,7 +157,7 @@ UserRouter.put('/update/avatar/:id', auth, async (req, res) => {
 UserRouter.put('/update/nickName/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().UpdateNickName("users", id, req.body);
+    let data = await DB.UpdateNickName("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -166,7 +168,7 @@ UserRouter.put('/update/nickName/:id', auth, async (req, res) => {
 UserRouter.put('/update/notification/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().UpdateNotifications("users", id, req.body);
+    let data = await DB.UpdateNotifications("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -176,7 +178,7 @@ UserRouter.put('/update/notification/:id', auth, async (req, res) => {
 UserRouter.put('/update/addPlayDate/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().addPlayDate("users", id, req.body);
+    let data = await DB.addPlayDate("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -186,7 +188,7 @@ UserRouter.put('/update/addPlayDate/:id', auth, async (req, res) => {
 UserRouter.put('/update/currentLevel/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().UpdateCurrentLevel("users", id, req.body);
+    let data = await DB.UpdateCurrentLevel("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -197,7 +199,7 @@ UserRouter.put('/update/currentLevel/:id', auth, async (req, res) => {
 UserRouter.put('/update/levelPopularity/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().UpdateLevelPopularity("users", id, req.body);
+    let data = await DB.UpdateLevelPopularity("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -209,7 +211,7 @@ UserRouter.put('/update/levelPopularity/:id', auth, async (req, res) => {
 UserRouter.put('/update/levelRank/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().UpdateLevelRank("users", id, req.body);
+    let data = await DB.UpdateLevelRank("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });
@@ -221,7 +223,7 @@ UserRouter.put('/update/levelRank/:id', auth, async (req, res) => {
 UserRouter.put('/update/addLevelRank/:id', auth, async (req, res) => {
   try {
     let { id } = req.params;
-    let data = await new DB().addLevelRank("users", id, req.body);
+    let data = await DB.addLevelRank("users", id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error });

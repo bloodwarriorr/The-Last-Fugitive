@@ -1,10 +1,12 @@
 const Life = require("../models/life_model");
-const DB = require("../utils/db");
+// const DB = require("../utils/db");
+const DBSingleton = require('../utils/db-singleton');
+const DB = DBSingleton.getInstance();
 const LifeRouter = require("express").Router();
 
 LifeRouter.get("/client", async (req, res) => {
   try {
-    const data = await new DB().FindAll("life");
+    const data = await DB.FindAll("life");
 
     if (data[0].addedLifeForRegister.dueTo) {
 
@@ -32,7 +34,7 @@ LifeRouter.get("/client", async (req, res) => {
 LifeRouter.post("/createLife", async (req, res) => {
   try {
     let life = new Life();
-    await new DB().Insert("life", life);
+    await DB.Insert("life", life);
     res.status(200).json(life);
   } catch (error) {
     res.status(500).json({ error });

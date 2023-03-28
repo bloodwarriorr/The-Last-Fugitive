@@ -1,6 +1,8 @@
 const Guest=require('../models/guest_model')
 const jwt = require('jsonwebtoken');
-const DB = require('../utils/db');
+// const DB = require('../utils/db');
+const DBSingleton = require('../utils/db-singleton');
+const DB = DBSingleton.getInstance();
 const GuestRouter = require('express').Router();
 const auth = require("../middleware/auth");
 
@@ -17,7 +19,7 @@ GuestRouter.post("/register", async (req, res) => {
     );
     // save user token
     guest.token = token;
-    await new DB().Insert("guests", guest);
+    await DB.Insert("guests", guest);
     // return new user
     res.status(201).json(guest);
   } catch (err) {
@@ -29,7 +31,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/notification/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().UpdateNotifications("guests", id, req.body);
+      let data = await DB.UpdateNotifications("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -39,7 +41,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/addPlayDate/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().addPlayDate("guests", id, req.body);
+      let data = await DB.addPlayDate("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -49,7 +51,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/currentLevel/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().UpdateCurrentLevel("guests", id, req.body);
+      let data = await DB.UpdateCurrentLevel("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -60,7 +62,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/levelPopularity/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().UpdateLevelPopularity("guests", id, req.body);
+      let data = await DB.UpdateLevelPopularity("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -71,7 +73,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/levelRank/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().UpdateLevelRank("guests", id, req.body);
+      let data = await DB.UpdateLevelRank("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -83,7 +85,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.put('/update/addLevelRank/:id', auth, async (req, res) => {
     try {
       let { id } = req.params;
-      let data = await new DB().addLevelRank("guests", id, req.body);
+      let data = await DB.addLevelRank("guests", id, req.body);
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error });
@@ -94,7 +96,7 @@ GuestRouter.post("/register", async (req, res) => {
   GuestRouter.get('/:id', async (req, res) => {
     try {
       let { id } = req.params; //get the id param.
-      let data = await new DB().FindByID("guests", id);
+      let data = await DB.FindByID("guests", id);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error });
