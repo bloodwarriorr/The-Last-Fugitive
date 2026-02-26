@@ -1,5 +1,5 @@
 class Admin {
-    uid
+    uid ='';
 
 
     constructor(uid) {
