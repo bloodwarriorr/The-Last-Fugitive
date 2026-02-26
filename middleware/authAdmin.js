@@ -1,19 +1,19 @@
 const DBSingleton = require('../utils/db-singleton');
 const DB = DBSingleton.getInstance();
 const verifyAdmin = async(req, res, next) => {
-    const uid =
-      req.body.uid || req.query.uid || req.headers["uid"];
-  
-    if (!uid) {
-      return res.status(403).send("Uid is required for authentication");
+    const uuid =
+      req.body?.uuid || req.query?.uuid || req.headers["uuid"];
+
+    if (!uuid) {
+      return res.status(403).send("Uuid is required for authentication");
     }
     try {
-      const validAdmin= await DB.FindByUID("admin",uid)
+      const validAdmin= await DB.FindByUID("admin",uuid)
       if(!validAdmin){
         return res.status(403).send("Bad Credentials");
       }
     } catch (err) {
-      return res.status(401).send("Invalid Uid");
+      return res.status(401).send("Invalid Uuid");
     }
     return next();
   };

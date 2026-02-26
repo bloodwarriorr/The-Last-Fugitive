@@ -1,9 +1,9 @@
 class Admin {
-    uid ='';
+    uuid
 
 
-    constructor(uid) {
-        this.uid = uid;
+    constructor(uuid) {
+        this.uuid = uuid;
 
     }
 }

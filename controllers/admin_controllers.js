@@ -34,7 +34,7 @@ AdminRouter.post('/signUp', loginRateLimiter, async (req, res) => {
         const loggedInAdmin = await signInWithEmailAndPassword(auth, credentials.email, credentials.password)
 
         if (loggedInAdmin) {
-            res.status(200).json(loggedInAdmin.user.uid)
+            res.status(200).json(loggedInAdmin.user?.uid)
         }
     }
     catch (error) {

@@ -30,10 +30,10 @@ class DB {
             await this.client.close();
         }
     }
-    async FindByUID(collection, uid) {
+    async FindByUID(collection, uuid) {
         try {
             await this.client.connect();
-            return await this.client.db(this.dbName).collection(collection).findOne({ uid: uid });
+            return await this.client.db(this.dbName).collection(collection).findOne({ uuid: uuid });
         } catch (error) {
             return error;
         } finally {
